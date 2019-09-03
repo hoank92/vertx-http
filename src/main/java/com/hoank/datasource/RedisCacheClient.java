@@ -6,7 +6,7 @@ import io.vertx.redis.RedisClient;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class RedisCacheClient {
+public class RedisCacheClient implements CacheClient{
 
     private RedisClient client;
 
@@ -14,6 +14,7 @@ public class RedisCacheClient {
         this.client = client;
     }
 
+    @Override
     public Future<String> getValue(String key) {
         Promise<String> promise = Promise.promise();
         client.get(key, res -> {
@@ -27,6 +28,7 @@ public class RedisCacheClient {
         return promise.future();
     }
 
+    @Override
     public Future<String> insertValue(String key, String value) {
         Promise<String> promise = Promise.promise();
         client.set(key, value, res -> {

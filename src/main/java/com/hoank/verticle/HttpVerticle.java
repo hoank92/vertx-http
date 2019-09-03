@@ -2,14 +2,18 @@ package com.hoank.verticle;
 
 import com.hoank.api.PingApi;
 import com.hoank.api.UserApi;
+import com.hoank.datasource.CacheClient;
+import com.hoank.datasource.KafkaClient;
 import com.hoank.datasource.RedisCacheClient;
 import com.hoank.handler.UserHandler;
+import com.hoank.handler.UserService;
 import com.hoank.utils.AppContext;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
+import io.vertx.kafka.client.producer.KafkaProducer;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import lombok.extern.log4j.Log4j2;
@@ -29,16 +33,21 @@ public class HttpVerticle extends AbstractVerticle {
                 new RedisOptions().setHost(AppContext.get("redis_host")));
         MongoClient mongoClient = MongoClient.createShared(vertx, getMongoConfig());
 
+        KafkaProducer<String, String> producer = KafkaProducer.create(vertx, KafkaClient.getConfigKafkaProducer());
+
 
         Router router = Router.router(vertx);
-        new PingApi(vertx).configRoute(router);
+        PingApi pingApi = new PingApi(vertx);
+        pingApi.setProducer(producer);
+        pingApi.configRoute(router);
 
-        RedisCacheClient redisCacheClient = new RedisCacheClient(client);
-        UserHandler userHandler = new UserHandler(mongoClient);
+
+        CacheClient redisCacheClient = new RedisCacheClient(client);
+        UserService userService = new UserHandler(mongoClient);
 
         UserApi userApi = new UserApi(vertx);
-        userApi.setRedis(redisCacheClient);
-        userApi.setUserHandler(userHandler);
+        userApi.setCacheClient(redisCacheClient);
+        userApi.setUserService(userService);
         userApi.configRoute(router);
 
         final Integer httpPort = config().getInteger("http.port", 8080);

@@ -1,7 +1,9 @@
 package com.hoank.api;
 
+import com.hoank.datasource.CacheClient;
 import com.hoank.datasource.RedisCacheClient;
 import com.hoank.handler.UserHandler;
+import com.hoank.handler.UserService;
 import com.hoank.model.UserInfo;
 import com.hoank.utils.DslJsonUtils;
 import io.vertx.core.AsyncResult;
@@ -21,8 +23,8 @@ import lombok.extern.log4j.Log4j2;
 @Setter
 @Log4j2
 public class UserApi extends AbstractHttpHandler {
-    private RedisCacheClient redis;
-    private UserHandler userHandler;
+    private CacheClient cacheClient;
+    private UserService userService;
 
     public UserApi(Vertx vertx) {
         super(vertx);
@@ -31,7 +33,7 @@ public class UserApi extends AbstractHttpHandler {
     @Override
     public void configRoute(Router router) {
         router.get("/user").handler(routingContext -> {
-            Future<String> future = redis.getValue("hoank");
+            Future<String> future = cacheClient.getValue("hoank");
             future.compose(res -> future).setHandler(res -> {
                 if (res.succeeded()) {
                     routingContext.response().end(JsonObject.mapFrom(DslJsonUtils.deserialize(future.result(), UserInfo.class)).encode());
@@ -55,7 +57,7 @@ public class UserApi extends AbstractHttpHandler {
             userInfo.setId(id);
             userInfo.setUsername("hoank");
             userInfo.setFullname("nguyen khanh hoa");
-            Future<String> future = redis.insertValue("hoank", DslJsonUtils.serialize(userInfo));
+            Future<String> future = cacheClient.insertValue("hoank", DslJsonUtils.serialize(userInfo));
             future.compose(res -> future).setHandler(res -> {
                 if (res.succeeded()) {
                     routingContext.response().end(JsonObject.mapFrom(userInfo).encode());
@@ -70,7 +72,7 @@ public class UserApi extends AbstractHttpHandler {
         router.get("/user/username/:username").handler(routingContext -> {
             HttpServerRequest request = routingContext.request();
             String username = request.getParam("username");
-            Future<JsonObject> future = userHandler.findOneByUserName(username);
+            Future<JsonObject> future = userService.findOneByUserName(username);
             future.compose(res -> future).setHandler(res -> {
                 if (res.succeeded()) {
                     routingContext.response().end(JsonObject.mapFrom(res.result()).encode());
@@ -85,7 +87,7 @@ public class UserApi extends AbstractHttpHandler {
         router.post("/user").handler(routingContext -> {
            routingContext.request().bodyHandler(res -> {
                UserInfo userInfo = res.toJsonObject().mapTo(UserInfo.class);
-               Future<UserInfo> future = userHandler.addUser(userInfo);
+               Future<UserInfo> future = userService.addUser(userInfo);
                future.compose(tmp -> future).setHandler(resp -> responseData(resp, routingContext));
            });
         });
