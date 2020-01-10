@@ -7,15 +7,13 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 /**
  * Created by hoank92 on Jan, 2020
@@ -25,7 +23,7 @@ public class UserServiceImpl implements UserService {
 
     private final HashMap<Query, String> sqlQueries;
     private final JDBCClient dbClient;
-    private static Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static Logger log = LogManager.getLogger(UserServiceImpl.class);
 
 
     public UserServiceImpl(JDBCClient dbClient, HashMap<Query, String> sqlQueries, Handler<AsyncResult<UserService>> readyHandler) {

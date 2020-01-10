@@ -10,6 +10,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -28,6 +29,8 @@ public class HttpVerticle extends AbstractVerticle {
         UserService userService = UserService.createProxy(vertx, wikiDbQueue);
 
         Router router = Router.router(vertx);
+        router.route().handler(BodyHandler.create());
+
         PingApi pingApi = new PingApi(vertx);
         pingApi.configRoute(router);
 

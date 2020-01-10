@@ -6,15 +6,18 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by hoank92 on Aug, 2019
  */
-@Log4j2
 public class UserApi extends AbstractHttpHandler {
     private UserService userService;
+
+    private static Logger log = LogManager.getLogger(UserApi.class);
+
 
     public UserApi(Vertx vertx, UserService userService) {
         super(vertx);

@@ -1,29 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="warn" packages="org.apache.logging.log4j.core">
+<Configuration name="systemConfiguration" schema="http://jakarta.apache.org/log4j2/">
+    <Properties>
+        <Property name="log-path">log</Property>
+    </Properties>
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%.15t] %-5p %c{1}:%L - %m%n"/>
-        </Console>
-        <Console name="ErrorConsole" target="SYSTEM_ERR">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%.15t] %-5p %c{1}:%L - %m%n"/>
-        </Console>
-        <RollingFile name="RollingFile" fileName="logs/app.log"
-                     filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+        <Console name="console-appender" target="STDOUT">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%.15t] %-5p %c{1}:%L - %m%n</Pattern>
+                <pattern>
+                    %highlight{[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n}
+                </pattern>
             </PatternLayout>
+        </Console>
+        <RollingFile name="user-tracking-appender" append="true"
+                     fileName="${log-path}/user-tracking.log" filePattern="${log-path}/user-tracking-%d{yyyy-MM-dd-HH}_%i.log" >
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n"/>
             <Policies>
-                <TimeBasedTriggeringPolicy />
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
                 <SizeBasedTriggeringPolicy size="250 MB"/>
+                <OnStartupTriggeringPolicy minSize="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="system-file-appender" append="true"
+                     fileName="${log-path}/system.log" filePattern="${log-path}/system-%d{yyyy-MM-dd-HH}_%i.log" >
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+                <OnStartupTriggeringPolicy minSize="1"/>
             </Policies>
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Root level="all">
-            <AppenderRef ref="Console" level="info"/>
-            <AppenderRef ref="ErrorConsole" level="error"/>
-            <AppenderRef ref="RollingFile" level="off"/>
+        <Logger name="user-tracking-Logger" level="info" additivity="false">
+            <AppenderRef ref="user-tracking-appender"/>
+            <AppenderRef ref="console-appender"/>
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="console-appender"/>
+            <AppenderRef ref="system-file-appender"/>
         </Root>
-
     </Loggers>
 </Configuration>

@@ -5,17 +5,15 @@ package com.hoank.utils;
  */
 
 import com.typesafe.config.ConfigFactory;
-import lombok.extern.log4j.Log4j2;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 public class AppContext {
-    private static Logger log = LoggerFactory.getLogger(AppContext.class);
+    private static Logger log = LogManager.getLogger(AppContext.class);
 
     public static void init() {
         log.info("Load application configurations...");

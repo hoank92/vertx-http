@@ -4,15 +4,14 @@ import com.hoank.utils.AppContext;
 import com.hoank.verticle.HttpVerticle;
 import com.hoank.verticle.MySqlVerticle;
 import io.vertx.core.*;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 /**
  * Created by hoank92 on Aug, 2019
  */
 
 public class MainApp {
-    private static Logger log = LoggerFactory.getLogger(MainApp.class);
+    private static Logger log = LogManager.getLogger(MainApp.class);
 
 
     public static void main(String[] args) {
