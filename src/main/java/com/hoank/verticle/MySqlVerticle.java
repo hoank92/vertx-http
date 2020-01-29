@@ -2,6 +2,7 @@ package com.hoank.verticle;
 
 import com.hoank.datasource.Query;
 import com.hoank.datasource.UserService;
+import com.hoank.utils.AppContext;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -20,9 +21,6 @@ import java.util.Properties;
  */
 public class MySqlVerticle extends AbstractVerticle {
 
-    public static final String CONFIG_USER_JDBC_URL = "jdbc.url";
-    public static final String CONFIG_USER_JDBC_DRIVER_CLASS = "jdbc.driver_class";
-    public static final String CONFIG_USER_JDBC_MAX_POOL_SIZE = "jdbc.max_pool_size";
     public static final String CONFIG_USER_QUEUE = "userdb.queue";
 
     @Override
@@ -31,9 +29,9 @@ public class MySqlVerticle extends AbstractVerticle {
         HashMap<Query, String> sqlQueries = loadSqlQueries();
 
         JDBCClient dbClient = JDBCClient.createShared(vertx, new JsonObject()
-                .put("url", config().getString(CONFIG_USER_JDBC_URL, "jdbc:hsqldb:file:db/wiki"))
-                .put("driver_class", config().getString(CONFIG_USER_JDBC_DRIVER_CLASS, "org.hsqldb.jdbcDriver"))
-                .put("max_pool_size", config().getInteger(CONFIG_USER_JDBC_MAX_POOL_SIZE, 30)));
+                .put("url", AppContext.get("mysql_url"))
+                .put("driver_class", AppContext.get("mysql_driver_class"))
+                .put("max_pool_size", Integer.parseInt(AppContext.get("mysql_pool_size"))));
 
         UserService.create(dbClient, sqlQueries, ready -> {
             if (ready.succeeded()) {
@@ -42,6 +40,7 @@ public class MySqlVerticle extends AbstractVerticle {
                         .register(UserService.class, ready.result()); // <1>
                 promise.complete();
             } else {
+
                 promise.fail(ready.cause());
             }
         });
