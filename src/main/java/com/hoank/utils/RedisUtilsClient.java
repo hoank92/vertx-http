@@ -2,26 +2,28 @@ package com.hoank.utils;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.redis.RedisClient;
+import io.vertx.redis.client.RedisAPI;
 
 /**
  * Created by hoank92 on Jan, 2020
  */
 public class RedisUtilsClient {
 
-    private RedisClient client;
+    private RedisAPI redis;
 
-    public RedisUtilsClient(RedisClient redisClient) {
-        this.client = redisClient;
+    public RedisUtilsClient(RedisAPI redisClient) {
+        this.redis = redisClient;
     }
+
+
 
     public Future<Long> getId(String key) {
         Promise<Long> promise = Promise.promise();
-        client.incr(key, res -> {
+        redis.incr(key, res -> {
             if (res.failed()) {
                 promise.fail(res.cause());
             } else {
-                promise.complete(res.result());
+                promise.complete(res.result().toLong());
             }
         });
         return promise.future();
