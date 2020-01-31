@@ -26,7 +26,7 @@ public class DnsVerticle extends AbstractVerticle {
         dnsClient = vertx.createDnsClient(new DnsClientOptions()
 //                .setPort(53)
 //                .setHost(hosts[new Random().nextInt(hosts.length)])
-                .setQueryTimeout(10000)
+                .setQueryTimeout(5000)
         );
         //dnsClient = vertx.createDnsClient();
         EventBus eb = vertx.eventBus();

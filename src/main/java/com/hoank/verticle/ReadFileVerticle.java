@@ -31,9 +31,9 @@ public class ReadFileVerticle extends AbstractVerticle {
                 for (String domain : domains) {
                     i += 1;
                     eb.send("dsn-lookup", domain);
-                    if (i % 40 == 0) {
+                    if (i % 50 == 0) {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(50);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
